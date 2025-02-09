@@ -35,7 +35,6 @@ const nextConfig = {
 	},
 	//@ts-ignore
 	webpack: (config, { isServer }) => {
-		config.externals = [...config.externals, "@prisma/client"];
 		if (!isServer) {
 			if (!config.resolve) {
 				config.resolve = {};
