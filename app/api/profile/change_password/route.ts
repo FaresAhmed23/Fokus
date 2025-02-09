@@ -2,7 +2,7 @@ import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { changePasswordSchema } from "@/schema/changePasswordSchema";
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 
 export async function POST(request: Request) {
   const session = await getAuthSession();
@@ -41,14 +41,14 @@ export async function POST(request: Request) {
     if (!user.hashedPassword)
       return new NextResponse("ERRORS.NO_PASSWORD", { status: 406 });
 
-    const passwordMatch = await bcrypt.compare(
+    const passwordMatch = await bcryptjs.compare(
       current_password,
       user.hashedPassword
     );
     if (!passwordMatch)
       return new NextResponse("ERRORS.PASSWORD_MISMATCH", { status: 402 });
 
-    const hashedPassword = await bcrypt.hash(new_password, 10);
+    const hashedPassword = await bcryptjs.hash(new_password, 10);
 
     const updatedUser = await db.user.update({
       where: {
