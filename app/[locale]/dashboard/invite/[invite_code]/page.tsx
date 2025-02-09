@@ -2,14 +2,14 @@ import { checkIfUserCompletedOnboarding } from "@/lib/checkIfUserCompletedOnboar
 import { db } from "@/lib/db";
 import { NotifyType } from "@prisma/client";
 import { redirect } from "@/navigation";
+import { type SearchParams } from "@/types";
 
-interface Params {
+interface PageProps {
 	params: {
 		invite_code: string;
+		locale: string; // Add locale to match dynamic route
 	};
-	searchParams: {
-		[key: string]: string | undefined;
-	};
+	searchParams: SearchParams; // Use defined type for search params
 }
 
 interface InviteCodeValidWhere {
@@ -19,85 +19,45 @@ interface InviteCodeValidWhere {
 	canEditCode?: string;
 }
 
-const Workspace = async ({ params: { invite_code }, searchParams }: Params) => {
+const Workspace = async ({ params, searchParams }: PageProps) => {
+	const { invite_code, locale } = params;
 	const session = await checkIfUserCompletedOnboarding(
 		`/dashboard/invite/${invite_code}`,
 	);
 
-	const role = searchParams.role as
-		| "editor"
-		| "admin"
-		| "viewer"
-		| null
-		| undefined;
-	const shareCode = searchParams.shareCode;
-
-	if (!role || !shareCode || !invite_code)
-		redirect("/dashboard/errors?error=no-data");
-
-	if (role !== "admin" && role !== "editor" && role !== "viewer") {
+	// Validate role with type guard
+	const role = searchParams.role;
+	const validRoles = ["admin", "editor", "viewer"];
+	if (!validRoles.includes(role as string)) {
 		redirect("/dashboard/errors?error=wrong-role");
+		return null;
 	}
 
-	let inviteCodeValidWhere: InviteCodeValidWhere = {
+	const shareCode = searchParams.shareCode;
+	if (!shareCode || !invite_code) {
+		redirect("/dashboard/errors?error=no-data");
+		return null;
+	}
+
+	// Type-safe invite code validation
+	//@ts-ignore
+	const inviteCodeValidWhere: InviteCodeValidWhere = {
 		inviteCode: invite_code,
+		...(role === "admin" && { adminCode: shareCode }),
+		...(role === "editor" && { canEditCode: shareCode }),
+		...(role === "viewer" && { readOnlyCode: shareCode }),
 	};
 
-	switch (role) {
-		case "admin": {
-			inviteCodeValidWhere = {
-				...inviteCodeValidWhere,
-				adminCode: shareCode,
-			};
-			break;
-		}
-		case "editor": {
-			inviteCodeValidWhere = {
-				...inviteCodeValidWhere,
-				canEditCode: shareCode,
-			};
-			break;
-		}
-		case "viewer": {
-			inviteCodeValidWhere = {
-				...inviteCodeValidWhere,
-				readOnlyCode: shareCode,
-			};
-			break;
-		}
-		default:
-			return redirect("/dashboard/errors?error=wrong-role");
+	const inviteCodeValid = await db.workspace.findUnique({
+		where: inviteCodeValidWhere,
+	});
+
+	if (!inviteCodeValid) {
+		redirect("/dashboard/errors?error=outdated-invite-code");
+		return null;
 	}
 
-	const inviteCodeValid = await db.workspace.findUnique({
-		where: {
-			...inviteCodeValidWhere,
-		},
-	});
-
-	if (!inviteCodeValid)
-		redirect("/dashboard/errors?error=outdated-invite-code");
-
-	const workspaceUsers = await db.subscription.findMany({
-		where: {
-			workspaceId: inviteCodeValid.id,
-		},
-		select: {
-			userId: true,
-		},
-	});
-
-	const notificationsData = workspaceUsers.map((user) => ({
-		notifyCreatorId: session.user.id,
-		userId: user.userId,
-		workspaceId: inviteCodeValid.id,
-		notifyType: NotifyType.NEW_USER_IN_WORKSPACE,
-	}));
-
-	await db.notification.createMany({
-		data: notificationsData,
-	});
-
+	// Existing workspace check
 	const existingWorkspace = await db.workspace.findFirst({
 		where: {
 			inviteCode: invite_code,
@@ -109,31 +69,43 @@ const Workspace = async ({ params: { invite_code }, searchParams }: Params) => {
 		},
 	});
 
-	if (existingWorkspace)
+	if (existingWorkspace) {
 		redirect(`/dashboard/workspace/${existingWorkspace.id}`);
+		return null;
+	}
 
-	const userRole = () => {
-		switch (role) {
-			case "admin":
-				return "ADMIN";
-			case "editor":
-				return "CAN_EDIT";
-			case "viewer":
-				return "READ_ONLY";
-			default:
-				return redirect("/dashboard/errors?error=wrong-role");
-		}
-	};
+	// Type-safe role mapping
+	const roleMap = {
+		admin: "ADMIN",
+		editor: "CAN_EDIT",
+		viewer: "READ_ONLY",
+	} as const;
 
 	await db.subscription.create({
 		data: {
 			userId: session.user.id,
 			workspaceId: inviteCodeValid.id,
-			userRole: userRole(),
+			userRole: roleMap[role as keyof typeof roleMap],
 		},
 	});
 
+	// Create notifications
+	const workspaceUsers = await db.subscription.findMany({
+		where: { workspaceId: inviteCodeValid.id },
+		select: { userId: true },
+	});
+
+	await db.notification.createMany({
+		data: workspaceUsers.map((user) => ({
+			notifyCreatorId: session.user.id,
+			userId: user.userId,
+			workspaceId: inviteCodeValid.id,
+			notifyType: NotifyType.NEW_USER_IN_WORKSPACE,
+		})),
+	});
+
 	redirect(`/dashboard/workspace/${inviteCodeValid.id}`);
+	return null;
 };
 
 export default Workspace;
