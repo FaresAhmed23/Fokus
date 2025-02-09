@@ -2,6 +2,9 @@ const withNextIntl = require("next-intl/plugin")("./i18n.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	env: {
+    		PRISMA_SCHEMA_PATH: "prisma/schema.prisma"
+  	},
 	typescript: {
 		ignoreBuildErrors: true,
 	},
