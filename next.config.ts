@@ -63,7 +63,7 @@ const nextConfig = {
 					tls: false,
 					child_process: false,
 					debug: require.resolve("debug"),
-					util: require.resolve("util/"),
+					util: require.resolve("util"),
 					stream: require.resolve("stream-browserify"),
 					path: require.resolve("path-browserify"),
 					crypto: require.resolve("crypto-browserify"),
