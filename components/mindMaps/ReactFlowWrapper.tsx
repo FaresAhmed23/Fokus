@@ -3,6 +3,9 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
 
+// Try importing utils directly without aliases
+import { cn } from "../../lib/utils";
+
 interface ReactFlowWrapperProps {
 	children: ReactNode;
 }
@@ -17,10 +20,10 @@ export default function ReactFlowWrapper({ children }: ReactFlowWrapperProps) {
 		setMounted(true);
 	}, []);
 
-	if (!mounted) {
-		// Return a placeholder with the same dimensions until client-side hydration is complete
-		return <div className="w-full h-full" />;
-	}
-
-	return <ReactFlowProvider>{children}</ReactFlowProvider>;
+	// Use cn just to verify it's imported correctly
+	return mounted ? (
+		<ReactFlowProvider>{children}</ReactFlowProvider>
+	) : (
+		<div className={cn("w-full h-full")} />
+	);
 }
