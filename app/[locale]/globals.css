@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+	:root {
+		--background: 260 20% 98%;
+		--foreground: 260 10% 10%;
+
+		--card: 260 30% 96%;
+		--card-foreground: 260 10% 15%;
+
+		--popover: 260 30% 95%;
+		--popover-foreground: 260 10% 12%;
+
+		--primary: 265 80% 50%; /* Vibrant Purple */
+		--primary-foreground: 265 10% 98%;
+
+		--secondary: 270 40% 90%;
+		--secondary-foreground: 270 10% 20%;
+
+		--muted: 275 25% 92%;
+		--muted-foreground: 275 10% 35%;
+
+		--accent: 280 50% 85%;
+		--accent-foreground: 280 10% 15%;
+
+		--destructive: 350 70% 45%;
+		--destructive-foreground: 0 0% 98%;
+
+		--border: 270 15% 80%;
+		--input: 275 20% 85%;
+		--ring: 280 30% 70%;
+
+		--radius: 0.5rem;
+	}
+
+	.dark {
+		--background: 260 30% 5%;
+		--foreground: 260 10% 90%;
+
+		--card: 260 40% 12%;
+		--card-foreground: 260 10% 95%;
+
+		--popover: 260 35% 14%;
+		--popover-foreground: 260 10% 92%;
+
+		--primary: 265 80% 60%;
+		--primary-foreground: 265 10% 98%;
+
+		--secondary: 270 40% 20%;
+		--secondary-foreground: 270 10% 95%;
+
+		--muted: 275 25% 25%;
+		--muted-foreground: 275 10% 50%;
+
+		--accent: 280 50% 30%;
+		--accent-foreground: 280 10% 90%;
+
+		--destructive: 350 70% 55%;
+		--destructive-foreground: 0 0% 98%;
+
+		--border: 270 15% 18%;
+		--input: 275 20% 28%;
+		--ring: 280 30% 45%;
+	}
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+}
+
+.emoji-picker em-emoji-picker {
+	---rgb-accent: 34, 197, 94;
+	---shadow: 0px 0px 0px 0px white;
+
+	height: 400px;
+}
+
+.custom-button-uploading:after {
+	background-color: transparent !important;
+}

@@ -1,0 +1,18 @@
+version: "3.5"
+name: "fokus"
+services:
+  db:
+    image: postgres
+    restart: always
+    container_name: fokus-db
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_DB: "fokus"
+      POSTGRES_PASSWORD: password
+    volumes:
+      - database-data:/var/lib/postgresql-data/
+    ports:
+      - 8010:5432
+
+volumes:
+  database-data:
