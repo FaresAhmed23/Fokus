@@ -37,6 +37,7 @@ import { EdgeColor } from "@/types/enums";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { ScrollArea } from "../ui/scroll-area";
 import { useTranslations } from "next-intl";
+import { z } from "zod";
 
 interface Props {
 	clickedEdge: Edge | null;

@@ -2,15 +2,22 @@ import createMiddleware from "next-intl/middleware";
 import { withAuth } from "next-auth/middleware";
 import { NextRequest } from "next/server";
 
-const locales = ["ar", "en"];
-const publicPages = ["/", "/sign-in", "/sign-up"];
+// Define constants at the top for better maintainability and performance
+const LOCALES = ["ar", "en"];
+const DEFAULT_LOCALE = "en";
+const PUBLIC_PAGES = ["/", "/sign-in", "/sign-up"];
 
+// Precompile regex for better performance
+const PUBLIC_PATHNAME_PATTERN = new RegExp(
+	`^(/(${LOCALES.join("|")}))?(${PUBLIC_PAGES.join("|")})?/?$`,
+	"i",
+);
+
+// Create middleware instance once
 const intlMiddleware = createMiddleware({
-	locales,
-	defaultLocale: "en",
-	// Add these optional configurations
+	locales: LOCALES,
+	defaultLocale: DEFAULT_LOCALE,
 	localePrefix: "always",
-	// Optional: Add default timezone and formats
 	//@ts-ignore
 	timeZone: "UTC",
 	formats: {
@@ -24,13 +31,13 @@ const intlMiddleware = createMiddleware({
 	},
 });
 
+// Create auth middleware instance once
 const authMiddleware = withAuth(
-	function onSuccess(req) {
-		return intlMiddleware(req);
-	},
+	// Success handler
+	(req) => intlMiddleware(req),
 	{
 		callbacks: {
-			authorized: ({ token }) => token !== null,
+			authorized: ({ token }) => Boolean(token),
 		},
 		pages: {
 			signIn: "/sign-in",
@@ -38,24 +45,23 @@ const authMiddleware = withAuth(
 	},
 );
 
+/**
+ * Middleware handler for routing and authentication
+ * Uses short-circuiting for better performance
+ */
 export default function middleware(req: NextRequest) {
-	const publicPathnameRegex = RegExp(
-		`^(/(${locales.join("|")}))?(${publicPages.join("|")})?/?$`,
-		"i",
-	);
-	const isPublicPage = publicPathnameRegex.test(req.nextUrl.pathname);
+	// Fast path - check if public page
+	const isPublicPage = PUBLIC_PATHNAME_PATTERN.test(req.nextUrl.pathname);
 
-	if (isPublicPage) {
-		return intlMiddleware(req);
-	} else {
-		return (authMiddleware as any)(req);
-	}
+	// Avoid unnecessary function calls with direct return
+	return isPublicPage ? intlMiddleware(req) : (authMiddleware as any)(req);
 }
 
+// More specific matcher to improve performance
 export const config = {
 	matcher: [
-		"/((?!api|_next|.*\\..*).*)",
-		"/((?!api|_next|.*\\.|favicon.ico).*)",
+		// Exclude static files and API routes for better performance
+		"/((?!api|_next|_vercel|.*\\..*).+)",
 		"/",
 	],
 };
