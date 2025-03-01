@@ -1,14 +1,26 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
-// Import styles only once here
-import "reactflow/dist/style.css";
+// We'll dynamically import the CSS on the client side only
 
 interface ReactFlowWrapperProps {
 	children: ReactNode;
 }
 
 export default function ReactFlowWrapper({ children }: ReactFlowWrapperProps) {
+	const [mounted, setMounted] = useState(false);
+
+	useEffect(() => {
+		// Import the CSS only on the client side
+		import("reactflow/dist/style.css");
+		setMounted(true);
+	}, []);
+
+	if (!mounted) {
+		// Return a placeholder with the same dimensions until client-side hydration is complete
+		return <div className="w-full h-full" />;
+	}
+
 	return <ReactFlowProvider>{children}</ReactFlowProvider>;
 }
