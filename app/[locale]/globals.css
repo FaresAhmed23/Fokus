@@ -80,7 +80,7 @@ body {
 }
 
 .emoji-picker em-emoji-picker {
-	---rgb-accen: 34, 197, 94;
+	---rgb-accent: 34, 197, 94;
 	---shadow: 0px 0px 0px 0px white;
 
 	height: 400px;
