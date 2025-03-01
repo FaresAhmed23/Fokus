@@ -64,7 +64,11 @@
 		"use-debounce": "^10.0.4",
 		"uuid": "^11.0.5",
 		"zod": "^3.24.1",
-		"zustand": "^5.0.3"
+		"zustand": "^5.0.3",
+		"crypto-browserify": "^3.12.1",
+		"path-browserify": "^1.0.1",
+		"stream-browserify": "^3.0.0",
+		"util": "^0.12.5"
 	},
 	"devDependencies": {
 		"@tailwindcss/typography": "^0.5.16",
