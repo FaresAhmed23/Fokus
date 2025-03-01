@@ -1,16 +1,14 @@
 "use client";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { UserPermission, Workspace } from "@prisma/client";
+import { UserPermission } from "@prisma/client";
 import { ShortcutContainerBtnItem } from "./ShortcutContainerBtnItem";
 import {
-  MessageSquare,
   MessagesSquare,
   PencilRuler,
   Workflow,
 } from "lucide-react";
 import { LeaveWorkspace } from "@/components/workspaceMainPage/shortcuts/leaveWorkspace/LeaveWorkspace";
-import { ShortcutContainerItemPrivateMessageDialog } from "./privateMessagesDialog/ShortcutContainerItemPrivateMessageDialog";
 import { useNewTask } from "@/hooks/useNewTask";
 import { useNewMindMap } from "@/hooks/useNewMindMap";
 import { PermissionIndicator } from "@/components/workspaceMainPage/shortcuts/permissionIndicator/Permissionindicator";

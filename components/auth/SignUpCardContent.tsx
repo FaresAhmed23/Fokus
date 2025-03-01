@@ -59,14 +59,14 @@ export const SignUpCardContent = () => {
 					password: data.password,
 					redirect: false,
 				});
-				router.push("/");
+				router.push("/sign-in");
 			} else throw new Error(signUpInfo);
 		} catch (err) {
 			let errMsg = m("ERRORS.DEFAULT");
 			if (typeof err === "string") {
 				errMsg = err;
 			} else if (err instanceof Error) {
-				errMsg = m(err.message);
+				errMsg = err.message;
 			}
 			toast({
 				title: errMsg,

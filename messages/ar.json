@@ -70,8 +70,8 @@
 				"SURNAME": "اسم العيلة"
 			},
 			"PLACEHOLDER": {
-				"NAME": "Vineeth",
-				"SURNAME": "Reddy"
+				"NAME": "أحمد",
+				"SURNAME": "محمد"
 			}
 		},
 		"SECOND_STEP": {
@@ -390,7 +390,7 @@
 		"TAG": "ضيف وسم لخريطة العقل",
 		"DELETE": {
 			"MESSAGE": {
-				"SUCCES": "إعادة الضبط نجحت",
+				"SUCCESS": "إعادة الضبط نجحت",
 				"ERROR": "مش قادرين نحفظ التغييرات."
 			},
 			"HOVER": "امسح كل العناصر",
@@ -409,7 +409,8 @@
 				"LABEL": {
 					"LABEL": "التسمية",
 					"DESC": "اضافة نص هتظهر التسمية. سيب الحقل فاضي واحفظ التغييرات عشان تشيله.",
-					"PLACEHOLDER": "ضيف تسمية"
+					"PLACEHOLDER": "ضيف تسمية",
+					"ERROR": "التسمية لازم تتعمل"
 				},
 				"TYPE": {
 					"LABEL": "نوع الاتصال",
@@ -626,7 +627,7 @@
 	"ASSIGNED_TO_ME": {
 		"TITLE": "المخصصة لي",
 		"DESC": "هنا هتلاقي كل خرائط العقل والمهام اللي حفظتها.",
-		"NO_ASSIGMENT": "لسه ما اتخصصتش في أي حاجة",
+		"NO_ASSIGNMENT": "لسه ما اتخصصتش في أي حاجة",
 		"NOT_FOUND": "ملقيناش أي مهام أو خرائط عقل بتطابق المعايير",
 		"DEFAULT_NAME": {
 			"MIND_MAP": "خريطة عقل من غير عنوان",
@@ -718,8 +719,8 @@
 			"NEW_TASK_TEXT": "ضيف مهمة جديدة في مساحة العمل {name}",
 			"NEW_MIND_MAP_TEXT": "ضيف خريطة عقل جديدة في مساحة العمل {name}",
 			"NEW_ROLE_TEXT": "اتمنحت لك صلاحيات {role} في مساحة العمل {name}",
-			"NEW_ASSIGMENT_TASK_TEXT": "اتخصصت لك مهمة في مساحة العمل {name}",
-			"NEW_ASSIGMENT_MIND_MAP_TEXT": "اتخصصت لك خريطة عقل في مساحة العمل {name}"
+			"NEW_ASSIGNMENT_TASK_TEXT": "اتخصصت لك مهمة في مساحة العمل {name}",
+			"NEW_ASSIGNMENT_MIND_MAP_TEXT": "اتخصصت لك خريطة عقل في مساحة العمل {name}"
 		}
 	},
 	"HOME_PAGE": {
@@ -780,11 +781,11 @@
 		"NOTIFICATIONS": "{notifications} رسالة جديدة",
 		"NEW_MESSAGE": {
 			"PLACEHOLDER": "رسالة جديدة",
-			"DELETE_ATACHMENT": "امسح المرفق",
-			"ATACHMENT_DEAFULT_ERROR": "مش قادرين نضيف المرفقات.",
-			"ATACHMENT_TO_MANY_ERROR": "مش قادرين نضيف المرفقات. أقصى عدد للملفات هو 5 صور و5 ملفات PDF.",
-			"ATACHMENT_TO_BIG_ERROR": "مش قادرين نضيف المرفقات. في ملف حجمه كبير.",
-			"ATACHMENT_WRONG_FILE_ERROR": "مش قادرين نضيف المرفقات. في ملف بصيغة مش مدعومة."
+			"DELETE_ATTACHMENT": "امسح المرفق",
+			"ATTACHMENT_DEFAULT_ERROR": "مش قادرين نضيف المرفقات.",
+			"ATTACHMENT_TO_MANY_ERROR": "مش قادرين نضيف المرفقات. أقصى عدد للملفات هو 5 صور و5 ملفات PDF.",
+			"ATTACHMENT_TO_BIG_ERROR": "مش قادرين نضيف المرفقات. في ملف حجمه كبير.",
+			"ATTACHMENT_WRONG_FILE_ERROR": "مش قادرين نضيف المرفقات. في ملف بصيغة مش مدعومة."
 		}
 	},
 	"CLIENT_ERROR": {

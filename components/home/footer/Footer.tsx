@@ -7,7 +7,7 @@ import Link from "next/link";
 export const Footer = () => {
 	return (
 		<footer className="w-full bg-background border-t border-border mt-52">
-			<div className="container py-6 sm:py-12 max-w-screen-2xl border-t border-border flex flex-col-reverse sm:flex-row sm:justify-between items-center gap-4">
+			<div className="container sm:px-20 px-0 py-6 sm:py-12 max-w-screen-2xl border-t border-border flex flex-col-reverse sm:flex-row sm:justify-between items-center gap-4">
 				<div className="text-center space-y-0.5 sm:text-left">
 					<p className="font-semibold sm:text-lg">
 						Made with <span className="text-primary">love</span>

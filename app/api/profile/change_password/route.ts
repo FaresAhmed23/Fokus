@@ -41,6 +41,7 @@ export async function POST(request: Request) {
 		if (!user.hashedPassword)
 			return new NextResponse("ERRORS.NO_PASSWORD", { status: 406 });
 
+<<<<<<< HEAD
 		const passwordMatch = await bcryptjs.compare(
 			current_password,
 			user.hashedPassword,
@@ -49,6 +50,16 @@ export async function POST(request: Request) {
 			return new NextResponse("ERRORS.PASSWORD_MISMATCH", { status: 402 });
 
 		const hashedPassword = await bcryptjs.hash(new_password, 10);
+=======
+    const passwordMatch = await bcryptjs.compare(
+      current_password,
+      user.hashedPassword
+    );
+    if (!passwordMatch)
+      return new NextResponse("ERRORS.PASSWORD_MISMATCH", { status: 402 });
+
+    const hashedPassword = await bcryptjs.hash(new_password, 10);
+>>>>>>> 9d0a57343d609daeefaf5a0778466d103ac1fef8
 
 		const updatedUser = await db.user.update({
 			where: {

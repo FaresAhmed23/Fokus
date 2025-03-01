@@ -1,15 +1,15 @@
 import { checkIfUserCompletedOnboarding } from "@/lib/checkIfUserCompletedOnboarding";
 import { db } from "@/lib/db";
 import { NotifyType } from "@prisma/client";
-import { redirect } from "@/navigation";
+import { redirect } from "next/navigation"; // Changed to server-side redirect
 import { type SearchParams } from "@/types";
 
 interface PageProps {
 	params: {
 		invite_code: string;
-		locale: string; // Add locale to match dynamic route
+		locale: string;
 	};
-	searchParams: SearchParams; // Use defined type for search params
+	searchParams: SearchParams;
 }
 
 interface InviteCodeValidWhere {
@@ -22,25 +22,23 @@ interface InviteCodeValidWhere {
 const Workspace = async ({ params, searchParams }: PageProps) => {
 	const { invite_code, locale } = params;
 	const session = await checkIfUserCompletedOnboarding(
-		`/dashboard/invite/${invite_code}`,
+		`/${locale}/dashboard/invite/${invite_code}`,
 	);
 
 	// Validate role with type guard
 	const role = searchParams.role;
-	const validRoles = ["admin", "editor", "viewer"];
-	if (!validRoles.includes(role as string)) {
-		redirect("/dashboard/errors?error=wrong-role");
-		return null;
+	const validRoles = ["admin", "editor", "viewer"] as const;
+
+	if (!role || !validRoles.includes(role as (typeof validRoles)[number])) {
+		redirect(`/${locale}/dashboard/errors?error=wrong-role`);
 	}
 
 	const shareCode = searchParams.shareCode;
 	if (!shareCode || !invite_code) {
-		redirect("/dashboard/errors?error=no-data");
-		return null;
+		redirect(`/${locale}/dashboard/errors?error=no-data`);
 	}
 
 	// Type-safe invite code validation
-	//@ts-ignore
 	const inviteCodeValidWhere: InviteCodeValidWhere = {
 		inviteCode: invite_code,
 		...(role === "admin" && { adminCode: shareCode }),
@@ -53,8 +51,7 @@ const Workspace = async ({ params, searchParams }: PageProps) => {
 	});
 
 	if (!inviteCodeValid) {
-		redirect("/dashboard/errors?error=outdated-invite-code");
-		return null;
+		redirect(`/${locale}/dashboard/errors?error=outdated-invite-code`);
 	}
 
 	// Existing workspace check
@@ -70,8 +67,7 @@ const Workspace = async ({ params, searchParams }: PageProps) => {
 	});
 
 	if (existingWorkspace) {
-		redirect(`/dashboard/workspace/${existingWorkspace.id}`);
-		return null;
+		redirect(`/${locale}/dashboard/workspace/${existingWorkspace.id}`);
 	}
 
 	// Type-safe role mapping
@@ -85,7 +81,7 @@ const Workspace = async ({ params, searchParams }: PageProps) => {
 		data: {
 			userId: session.user.id,
 			workspaceId: inviteCodeValid.id,
-			userRole: roleMap[role as keyof typeof roleMap],
+			userRole: roleMap[role],
 		},
 	});
 
@@ -104,8 +100,7 @@ const Workspace = async ({ params, searchParams }: PageProps) => {
 		})),
 	});
 
-	redirect(`/dashboard/workspace/${inviteCodeValid.id}`);
-	return null;
+	redirect(`/${locale}/dashboard/workspace/${inviteCodeValid.id}`);
 };
 
 export default Workspace;

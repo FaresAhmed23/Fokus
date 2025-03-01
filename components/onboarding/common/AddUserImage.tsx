@@ -178,7 +178,7 @@ export const AddUserImage = ({ profileImage, className }: Props) => {
 	};
 
 	return (
-		<div className="w-full flex flex-col justify-center items-center gap-2">
+		<div className="w-full flex flex-col justify-center items-center gap-2 py-5">
 			<p className="text-sm text-muted-foreground">Add a photo</p>
 			<Dialog open={open} onOpenChange={setOpen}>
 				<DialogTrigger asChild>
@@ -205,7 +205,7 @@ export const AddUserImage = ({ profileImage, className }: Props) => {
 						</div>
 					</Button>
 				</DialogTrigger>
-				<DialogContent className="flex flex-col items-center justify-center sm:max-w-[28rem] p-0">
+				<DialogContent className="flex flex-col items-center justify-center sm:max-w-[28rem] p-5">
 					<DialogHeader className="items-center justify-center">
 						<DialogTitle>Upload a photo</DialogTitle>
 					</DialogHeader>

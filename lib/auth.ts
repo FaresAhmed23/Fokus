@@ -101,31 +101,39 @@ export const authOptions: NextAuthOptions = {
 	secret: process.env.NEXTAUTH_SECRET,
 	callbacks: {
 		async session({ session, token }) {
-			if (token) {
-				session.user.id = token.id;
-				session.user.name = token.name;
-				session.user.email = token.email;
-				session.user.image = token.picture;
-				//@ts-ignore
-				session.user.username = token.username;
-				//@ts-ignore
-				session.user.surname = token.surname;
-				session.user.completedOnboarding = !!token.completedOnboarding;
-			}
+			try {
+				if (token) {
+					session.user.id = token.id;
+					session.user.name = token.name;
+					session.user.email = token.email;
+					session.user.image = token.picture;
+					//@ts-ignore
+					session.user.username = token.username;
+					//@ts-ignore
+					session.user.surname = token.surname;
+					session.user.completedOnboarding = !!token.completedOnboarding;
+				}
 
-			const user = await db.user.findUnique({
-				where: {
-					id: token.id,
-				},
-			});
+				const user = await db.user.findUnique({
+					where: {
+						id: token.id as string,
+					},
+				});
 
-			if (user) {
+				if (!user) {
+					throw new Error("User not found in database");
+				}
+
 				session.user.image = user.image;
 				session.user.completedOnboarding = user.completedOnboarding;
 				session.user.username = user.username;
-			}
 
-			return session;
+				return session;
+			} catch (error) {
+				console.error("Session callback error:", error);
+				// Return basic session data if there's an error
+				return session;
+			}
 		},
 		async jwt({ token, user, trigger, session }) {
 			if (user) {

@@ -1,5 +1,4 @@
 "use client";
-import { AppleLogo } from "@/components/svg/AppleLogo";
 import { LocaleSwitcher } from "@/components/switchers/LocaleSwitcher";
 import { ThemeSwitcher } from "@/components/switchers/ThemeSwitcher";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -43,10 +42,9 @@ export const MobileNav = () => {
 									});
 								}}
 							>
-								<AppleLogo className="w-10 h-10" />
 								<p className="text-2xl font-semibold">
-									F<span className="text-primary">O</span>k
-									<span className="text-primary">U</span>s
+									F<span className="text-primary">O</span>K
+									<span className="text-primary">U</span>S
 								</p>
 							</Button>
 						</SheetTitle>

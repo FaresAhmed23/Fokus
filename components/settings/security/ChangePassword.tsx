@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
 	changePasswordSchema,
 	ChangePasswordSchema,
+	createChangePasswordSchema,
 } from "@/schema/changePasswordSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User } from "@prisma/client";
@@ -23,9 +24,25 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/navigation";
 import { useForm } from "react-hook-form";
+import { createPasswordValidator } from "@/schema/signInSchema";
 
 export const ChangePassword = () => {
 	const t = useTranslations("SETTINGS.SECURITY.FORM");
+	const m = useTranslations("MESSAGES");
+
+	// Create custom password validator with translations
+	const passwordValidator = createPasswordValidator({
+		min: m("SCHEMA.PASSWORD.MIN"),
+		uppercase: m("SCHEMA.PASSWORD.UPPERCASE"),
+		lowercase: m("SCHEMA.PASSWORD.LOWERCASE"),
+		digit: m("SCHEMA.PASSWORD.DIGIT"),
+	});
+
+	const changePasswordSchema = createChangePasswordSchema(passwordValidator, {
+		passwordsNotMatch: m("SCHEMA.PASSWORD_NOT_THE_SAME"),
+		sameAsOld: m("SCHEMA.PASSWORD_SAME_AS_OLD"),
+	});
+
 	const form = useForm<ChangePasswordSchema>({
 		resolver: zodResolver(changePasswordSchema),
 		defaultValues: {
@@ -35,7 +52,6 @@ export const ChangePassword = () => {
 		},
 	});
 
-	const m = useTranslations("MESSAGES");
 	const { toast } = useToast();
 	const router = useRouter();
 

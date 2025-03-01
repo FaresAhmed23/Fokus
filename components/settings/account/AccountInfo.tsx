@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import {
-	accountInfoSettingsSchema,
+	createAccountInfoSettingsSchema,
 	AccountInfoSettingsSchema,
 } from "@/schema/accountInfoSettingsSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,11 +66,18 @@ export const AccountInfo = ({
 	const t = useTranslations("SETTINGS");
 	const m = useTranslations("MESSAGES");
 	const lang = useLocale();
+
+	const accountInfoSchema = createAccountInfoSettingsSchema({
+		usernameShort: m("SCHEMA.USERNAME.SHORT"),
+		specialChars: m("SCHEMA.USERNAME.SPECIAL_CHARS"),
+		languageRequired: m("SCHEMA.LANGUAGE"),
+	});
+
 	const { toast } = useToast();
 	const { update } = useSession();
 	const router = useRouter();
 	const form = useForm<AccountInfoSettingsSchema>({
-		resolver: zodResolver(accountInfoSettingsSchema),
+		resolver: zodResolver(accountInfoSchema),
 		defaultValues: {
 			username: username!,
 			language: lang,

@@ -70,8 +70,8 @@
 				"SURNAME": "Surname"
 			},
 			"PLACEHOLDER": {
-				"NAME": "Vineeth",
-				"SURNAME": "Reddy"
+				"NAME": "Ahmed",
+				"SURNAME": "Mohamed"
 			}
 		},
 		"SECOND_STEP": {
@@ -142,7 +142,9 @@
 			"IMAGE_PROFILE_DELETE": "Your profile image has been deleted!",
 			"ONBOARDING_COMPLETE": "Welcome to Fokus!",
 			"PASSWORD_CHANGED": "Password has been changed!",
-			"NEW_WORKSPACE": "The workspace has been created!"
+			"NEW_WORKSPACE": "The workspace has been created!",
+			"TASK_ADDED": "Message Sent Successfully",
+			"MIND_MAP_ADDED": "Mind Map Added"
 		},
 		"PENDING": {
 			"LOADING": "Please wait"
@@ -390,7 +392,7 @@
 		"TAG": "Add a tag to the mind map",
 		"DELETE": {
 			"MESSAGE": {
-				"SUCCES": "Reset successful",
+				"SUCCESS": "Reset successful",
 				"ERROR": "Failed to save changes."
 			},
 			"HOVER": "Delete all tiles",
@@ -409,7 +411,8 @@
 				"LABEL": {
 					"LABEL": "Label",
 					"DESC": "Adding text will display a label. Leave the field empty and save changes to remove it.",
-					"PLACEHOLDER": "Add label"
+					"PLACEHOLDER": "Add label",
+					"ERROR": "Label is needed"
 				},
 				"TYPE": {
 					"LABEL": "Connection Type",
@@ -627,7 +630,7 @@
 	"ASSIGNED_TO_ME": {
 		"TITLE": "Assigned to Me",
 		"DESC": "Here you will find all your saved mind maps and tasks",
-		"NO_ASSIGMENT": "You haven't been assigned anywhere yet",
+		"NO_ASSIGNMENT": "You haven't been assigned anywhere yet",
 		"NOT_FOUND": "We couldn't find any tasks or mind maps that met the criteria",
 		"DEFAULT_NAME": {
 			"MIND_MAP": "Untitled Mind Map",
@@ -678,14 +681,14 @@
 		"ROLES": {
 			"OWNER": "Owner",
 			"ADMIN": "Admin",
-			"EDITOR": "Editor",
+			"CAN_EDIT": "Editor",
 			"READ_ONLY": "Viewer"
 		},
 		"HINT": "Permission in {workspace} is",
 		"ROLES_DESC": {
 			"OWNER": "As the Owner, you have all possible rights. You can manage content, other users, and customize workspace settings. However, as the Owner, you cannot leave this workspace; the only option is to completely delete it in the settings.",
 			"ADMIN": "As an Admin, you have all possible rights, including changing workspace settings and managing other users.",
-			"EDITOR": "As an Editor, you have full access to the workspace, with rights to edit and delete content within the workspace. However, you do not have access to workspace settings.",
+			"CAN_EDIT": "As an Editor, you have full access to the workspace, with rights to edit and delete content within the workspace. However, you do not have access to workspace settings.",
 			"READ_ONLY": "As a Viewer, you have full access to the workspace but do not have permissions to edit the content within it. You also do not have access to workspace settings."
 		},
 		"BTN": "Understood"
@@ -719,8 +722,8 @@
 			"NEW_TASK_TEXT": "has added a new task in the workspace {name}",
 			"NEW_MIND_MAP_TEXT": "has added a new mind map in the workspace {name}",
 			"NEW_ROLE_TEXT": "You have been granted {role} level permissions in the workspace {name}",
-			"NEW_ASSIGMENT_TASK_TEXT": "You have been assigned a task in the workspace {name}",
-			"NEW_ASSIGMENT_MIND_MAP_TEXT": "You have been assigned to a mind map in the workspace {name}"
+			"NEW_ASSIGNMENT_TASK_TEXT": "You have been assigned a task in the workspace {name}",
+			"NEW_ASSIGNMENT_MIND_MAP_TEXT": "You have been assigned to a mind map in the workspace {name}"
 		}
 	},
 	"HOME_PAGE": {
@@ -779,11 +782,11 @@
 		"NOTIFICATIONS": "{notifications} new messages",
 		"NEW_MESSAGE": {
 			"PLACEHOLDER": "New message",
-			"DELETE_ATACHMENT": "Delete attachment",
-			"ATACHMENT_DEAFULT_ERROR": "Failed to add attachments.",
-			"ATACHMENT_TO_MANY_ERROR": "Failed to add attachments. The maximum number of files you can send at once is 5 images and 5 PDFs.",
-			"ATACHMENT_TO_BIG_ERROR": "Failed to add attachments. One of the files is too large.",
-			"ATACHMENT_WRONG_FILE_ERROR": "Failed to add attachments. One of the files has an unsupported format."
+			"DELETE_ATTACHMENT": "Delete attachment",
+			"ATTACHMENT_DEFAULT_ERROR": "Failed to add attachments.",
+			"ATTACHMENT_TO_MANY_ERROR": "Failed to add attachments. The maximum number of files you can send at once is 5 images and 5 PDFs.",
+			"ATTACHMENT_TO_BIG_ERROR": "Failed to add attachments. One of the files is too large.",
+			"ATTACHMENT_WRONG_FILE_ERROR": "Failed to add attachments. One of the files has an unsupported format."
 		}
 	},
 	"CLIENT_ERROR": {

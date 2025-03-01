@@ -23,7 +23,7 @@ export const useNewTask = (workspaceId: string) => {
 		},
 		onSuccess: (data: Task) => {
 			toast({
-				title: m("SUCCES.TASK_ADDED"),
+				title: m("SUCCESS.TASK_ADDED"),
 			});
 			router.push(
 				`/dashboard/workspace/${workspaceId}/tasks/task/${data.id}/edit`,

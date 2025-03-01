@@ -1,19 +1,44 @@
 import { z } from "zod";
-import { password } from "./signInSchema";
+import {
+	createPasswordValidator,
+	getDefaultPasswordValidator,
+} from "./signInSchema";
 
-export const changePasswordSchema = z
-  .object({
-    current_password: password,
-    new_password: password,
-    repeat_password: z.string(),
-  })
-  .refine((data) => data.new_password === data.repeat_password, {
-    message: "SCHEMA.PASSWORD_NOT_THE_SAME",
-    path: ["repeat_password"],
-  })
-  .refine((data) => data.new_password === data.current_password, {
-    message: "SCHEMA.PASSWORD_NOT_THE_SAME",
-    path: ["new_password"],
-  });
+// Create a change password schema factory
+export function createChangePasswordSchema(
+	passwordValidator: z.ZodEffects<z.ZodString, string, string>,
+	messages: {
+		passwordsNotMatch: string;
+		sameAsOld: string;
+	},
+) {
+	return z
+		.object({
+			current_password: passwordValidator,
+			new_password: passwordValidator,
+			repeat_password: z.string(),
+		})
+		.refine((data) => data.new_password === data.repeat_password, {
+			message: messages.passwordsNotMatch,
+			path: ["repeat_password"],
+		})
+		.refine((data) => data.new_password !== data.current_password, {
+			message: messages.sameAsOld,
+			path: ["new_password"],
+		});
+}
 
-export type ChangePasswordSchema = z.infer<typeof changePasswordSchema>;
+// Type will remain the same
+export type ChangePasswordSchema = z.infer<
+	ReturnType<typeof createChangePasswordSchema>
+>;
+
+// Default change password schema with message keys
+export const getDefaultChangePasswordSchema = () =>
+	createChangePasswordSchema(getDefaultPasswordValidator(), {
+		passwordsNotMatch: "SCHEMA.PASSWORD_NOT_THE_SAME",
+		sameAsOld: "SCHEMA.PASSWORD_SAME_AS_OLD",
+	});
+
+// For backward compatibility
+export const changePasswordSchema = getDefaultChangePasswordSchema();

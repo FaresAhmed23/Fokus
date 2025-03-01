@@ -49,7 +49,7 @@ export const SignInCardContent = () => {
 
 			if (account.error) {
 				toast({
-					title: m(account.error),
+					title: account.error,
 					variant: "destructive",
 				});
 			} else {
@@ -64,7 +64,7 @@ export const SignInCardContent = () => {
 			if (typeof err === "string") {
 				errMsg = err;
 			} else if (err instanceof Error) {
-				errMsg = m(err.message);
+				errMsg = err.message;
 			}
 			toast({
 				title: errMsg,
