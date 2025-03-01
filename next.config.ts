@@ -1,4 +1,3 @@
-import webpack from "webpack";
 const withNextIntl = require("next-intl/plugin")("./i18n.ts");
 const path = require("path");
 
@@ -11,9 +10,7 @@ const nextConfig = {
 	compiler: {
 		removeConsole:
 			process.env.NODE_ENV === "production"
-				? {
-						exclude: ["error", "warn"],
-				  }
+				? { exclude: ["error", "warn"] }
 				: false,
 	},
 
@@ -29,51 +26,20 @@ const nextConfig = {
 	images: {
 		domains: ["uploadthing.com", "utfs.io"],
 		remotePatterns: [
-			{
-				protocol: "https",
-				hostname: "github.com",
-			},
-			{
-				protocol: "https",
-				hostname: "lh3.googleusercontent.com",
-			},
-			{
-				protocol: "https",
-				hostname: "utfs.io",
-			},
-			{
-				protocol: "https",
-				hostname: "avatars.githubusercontent.com",
-			},
+			{ protocol: "https", hostname: "github.com" },
+			{ protocol: "https", hostname: "lh3.googleusercontent.com" },
+			{ protocol: "https", hostname: "utfs.io" },
+			{ protocol: "https", hostname: "avatars.githubusercontent.com" },
 		],
-		// Optimize image quality vs size
 		formats: ["image/webp"],
 	},
 
+	// Ensure reactflow is properly handled
 	transpilePackages: ["reactflow"],
 
-	// Webpack optimizations
-	// @ts-ignore
+	// Simplified webpack configuration - only necessary parts
 	webpack: (config, { isServer }) => {
-		config.module.rules = config.module.rules.filter(
-			(rule) => !(rule.test instanceof RegExp && rule.test.test(".css")),
-		);
-
-		config.module.rules.push({
-			test: /\.css$/,
-			use: ["style-loader", "css-loader", "postcss-loader"],
-			exclude: /node_modules/,
-		});
-
-		config.module.rules.push({
-			test: /\.css$/,
-			use: ["style-loader", "css-loader", "postcss-loader"],
-			include: [
-				path.join(__dirname, "node_modules/reactflow"),
-				path.join(__dirname, "node_modules/@reactflow"),
-			],
-		});
-
+		// Add path aliases
 		config.resolve.alias = {
 			...config.resolve.alias,
 			"@": path.resolve(__dirname),
@@ -93,42 +59,21 @@ const nextConfig = {
 				buffer: require.resolve("buffer/"),
 				process: require.resolve("process/browser"),
 			};
-		}
 
-		// Add bundle analyzer in analyze mode
-		if (process.env.ANALYZE === "true") {
-			const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
+			// Add necessary providers
 			config.plugins.push(
-				new BundleAnalyzerPlugin({
-					analyzerMode: "server",
-					analyzerPort: isServer ? 8888 : 8889,
-					openAnalyzer: true,
+				new (require("webpack").ProvidePlugin)({
+					process: "process/browser",
+					Buffer: ["buffer", "Buffer"],
 				}),
 			);
 		}
-
-		config.plugins.push(
-			new webpack.ProvidePlugin({
-				process: "process/browser",
-				Buffer: ["buffer", "Buffer"],
-			}),
-		);
-
-		// Optimize bundle size
-		config.optimization = {
-			...(config.optimization || {}),
-			moduleIds: "deterministic",
-			runtimeChunk: {
-				name: "runtime",
-			},
-		};
 
 		return config;
 	},
 
 	// Experimental features for performance
 	experimental: {
-		missingSuspenseWithCSRBailout: false,
 		optimizeCss: true,
 		optimizePackageImports: [
 			"@radix-ui/react-icons",
@@ -141,10 +86,6 @@ const nextConfig = {
 		serverActions: {
 			bodySizeLimit: "2mb",
 		},
-		// Only enable when your app is ready
-		// serverComponentsExternalPackages: ['bcryptjs'],
-		// Output file tracing for serverless
-		outputFileTracingRoot: path.join(__dirname, "../"),
 	},
 
 	// CDN cache settings

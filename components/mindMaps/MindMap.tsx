@@ -1,7 +1,5 @@
 "use client";
 
-import "reactflow/dist/base.css";
-import "reactflow/dist/style.css";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "../ui/button";
 import { EdgeOptions } from "./EdgeOptions";
@@ -19,7 +17,6 @@ import ReactFlow, {
 	Panel,
 	ReactFlowJsonObject,
 } from "reactflow";
-import "reactflow/dist/style.css";
 import { TextNode } from "./nodes/TextNode";
 import { CustomBezier } from "./labels/CustomBezier";
 import { CustomStraight } from "./labels/CustomStraight";
@@ -44,6 +41,7 @@ import { MindMapTagsSelector } from "./MindMapTagSelector";
 import { EditInfo } from "./editInfo/EditInfo";
 import { ExtendedMindMap } from "@/types/extended";
 import { useTranslations } from "next-intl";
+import ReactFlowWrapper from "./ReactFlowWrapper";
 
 const edgeTypes: EdgeTypes = {
 	customBezier: CustomBezier,
@@ -146,6 +144,7 @@ export const MindMap = ({
 
 	const onSaveChange = useCallback(
 		(data: EdgeOptionsSchema) => {
+			//@ts-ignore
 			const { animated, edgeId, label, color, type } = data;
 			setEdges((prevEdges) => {
 				const edges = prevEdges.map((edge) =>
@@ -194,108 +193,114 @@ export const MindMap = ({
 	if (!isMounted) return <LoadingScreen />;
 
 	return (
-		<div className="w-full h-full flex flex-col">
-			{clickedEdge && (
-				<Sheet open={openSheet} onOpenChange={setOpenSheet}>
-					<EdgeOptions
-						clickedEdge={clickedEdge}
-						isOpen={openSheet}
-						onSave={onSaveChange}
-						onDeleteEdge={onDeleteEdge}
-					/>
-				</Sheet>
-			)}
+		<ReactFlowWrapper>
+			<div className="w-full h-full flex flex-col">
+				{clickedEdge && (
+					<Sheet open={openSheet} onOpenChange={setOpenSheet}>
+						<EdgeOptions
+							clickedEdge={clickedEdge}
+							isOpen={openSheet}
+							onSave={onSaveChange}
+							onDeleteEdge={onDeleteEdge}
+						/>
+					</Sheet>
+				)}
 
-			<div className="h-full">
-				<ReactFlow
-					fitView
-					onInit={setRfInstance}
-					onNodeDrag={onNodeDrag}
-					nodes={nodes}
-					nodeTypes={nodeTypes}
-					edges={edges}
-					edgeTypes={edgeTypes}
-					onNodesChange={onNodesChange}
-					onEdgesChange={onEdgesChange}
-					onConnect={onConnect}
-					onEdgeClick={onEdgeClick}
-					onNodesDelete={onNodesDelete}
-					connectOnClick={isEditable}
-					edgesUpdatable={isEditable}
-					edgesFocusable={isEditable}
-					nodesDraggable={isEditable}
-					nodesConnectable={isEditable}
-					nodesFocusable={isEditable}
-					elementsSelectable={isEditable}
-					proOptions={{
-						hideAttribution: true,
-					}}
-				>
-					{isEditable && (
-						<Panel
-							position="top-left"
-							className="bg-background z-50 shadow-sm border rounded-sm py-0.5 px-3"
-						>
-							<div className="flex gap-2 w-full items-center">
-								<HoverCard openDelay={250} closeDelay={250}>
-									<HoverCardTrigger asChild>
-										<Button variant={"ghost"} size={"icon"} onClick={onAddNode}>
-											<PlusSquare size={22} />
-										</Button>
-									</HoverCardTrigger>
-									<HoverCardContent align="start">
-										{t("HOVER_TIP.ADD_TITLE")}
-									</HoverCardContent>
-								</HoverCard>
+				<div className="h-full">
+					<ReactFlow
+						fitView
+						onInit={setRfInstance}
+						onNodeDrag={onNodeDrag}
+						nodes={nodes}
+						nodeTypes={nodeTypes}
+						edges={edges}
+						edgeTypes={edgeTypes}
+						onNodesChange={onNodesChange}
+						onEdgesChange={onEdgesChange}
+						onConnect={onConnect}
+						onEdgeClick={onEdgeClick}
+						onNodesDelete={onNodesDelete}
+						connectOnClick={isEditable}
+						edgesUpdatable={isEditable}
+						edgesFocusable={isEditable}
+						nodesDraggable={isEditable}
+						nodesConnectable={isEditable}
+						nodesFocusable={isEditable}
+						elementsSelectable={isEditable}
+						proOptions={{
+							hideAttribution: true,
+						}}
+					>
+						{isEditable && (
+							<Panel
+								position="top-left"
+								className="bg-background z-50 shadow-sm border rounded-sm py-0.5 px-3"
+							>
+								<div className="flex gap-2 w-full items-center">
+									<HoverCard openDelay={250} closeDelay={250}>
+										<HoverCardTrigger asChild>
+											<Button
+												variant={"ghost"}
+												size={"icon"}
+												onClick={onAddNode}
+											>
+												<PlusSquare size={22} />
+											</Button>
+										</HoverCardTrigger>
+										<HoverCardContent align="start">
+											{t("HOVER_TIP.ADD_TITLE")}
+										</HoverCardContent>
+									</HoverCard>
 
-								<EditInfo
-									workspaceId={workspaceId}
-									title={initialInfo.title}
-									mapId={initialInfo.id}
-									emoji={initialInfo.emoji}
-								/>
+									<EditInfo
+										workspaceId={workspaceId}
+										title={initialInfo.title}
+										mapId={initialInfo.id}
+										emoji={initialInfo.emoji}
+									/>
 
-								<HoverCard openDelay={250} closeDelay={250}>
-									<HoverCardTrigger asChild>
-										<Button
-											variant={"ghost"}
-											size={"icon"}
-											onClick={() => {
-												onSetStatus("pending");
-												onSave();
-											}}
-											disabled={status === "pending" || status === "saved"}
-										>
-											<Save size={22} />
-										</Button>
-									</HoverCardTrigger>
-									<HoverCardContent align="start" sideOffset={8}>
-										{t("HOVER_TIP.SAVE")}
-									</HoverCardContent>
-								</HoverCard>
+									<HoverCard openDelay={250} closeDelay={250}>
+										<HoverCardTrigger asChild>
+											<Button
+												variant={"ghost"}
+												size={"icon"}
+												onClick={() => {
+													onSetStatus("pending");
+													onSave();
+												}}
+												disabled={status === "pending" || status === "saved"}
+											>
+												<Save size={22} />
+											</Button>
+										</HoverCardTrigger>
+										<HoverCardContent align="start" sideOffset={8}>
+											{t("HOVER_TIP.SAVE")}
+										</HoverCardContent>
+									</HoverCard>
 
-								<DeleteAllNodes
-									workspaceId={workspaceId}
-									mindMapId={initialInfo.id}
-								/>
+									<DeleteAllNodes
+										workspaceId={workspaceId}
+										mindMapId={initialInfo.id}
+									/>
 
-								<div className="h-8">
-									<Separator orientation="vertical" />
+									<div className="h-8">
+										<Separator orientation="vertical" />
+									</div>
+
+									<MindMapTagsSelector
+										initialActiveTags={initialActiveTags}
+										mindMapId={initialInfo.id}
+										isMounted={isMounted}
+										workspaceId={workspaceId}
+									/>
 								</div>
+							</Panel>
+						)}
 
-								<MindMapTagsSelector
-									initialActiveTags={initialActiveTags}
-									mindMapId={initialInfo.id}
-									isMounted={isMounted}
-									workspaceId={workspaceId}
-								/>
-							</div>
-						</Panel>
-					)}
-
-					<Background />
-				</ReactFlow>
+						<Background />
+					</ReactFlow>
+				</div>
 			</div>
-		</div>
+		</ReactFlowWrapper>
 	);
 };
