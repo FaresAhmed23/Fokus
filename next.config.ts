@@ -97,6 +97,7 @@ const nextConfig = {
 
 	// Experimental features for performance
 	experimental: {
+		missingSuspenseWithCSRBailout: false,
 		optimizeCss: true,
 		optimizePackageImports: [
 			"@radix-ui/react-icons",
