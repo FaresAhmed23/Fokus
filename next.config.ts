@@ -58,6 +58,23 @@ const nextConfig = {
 		config.module.rules.push({
 			test: /\.css$/,
 			use: [
+				"style-loader",
+				"css-loader",
+				{
+					loader: "postcss-loader",
+					options: {
+						postcssOptions: {
+							config: path.resolve(__dirname, "postcss.config.js"),
+						},
+					},
+				},
+			],
+			exclude: /node_modules/,
+		});
+
+		config.module.rules.push({
+			test: /\.css$/,
+			use: [
 				{
 					loader: "postcss-loader",
 					options: {
