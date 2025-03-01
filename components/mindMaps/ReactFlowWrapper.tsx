@@ -2,7 +2,6 @@
 
 import React, { ReactNode, useEffect, useState } from "react";
 import { ReactFlowProvider } from "reactflow";
-// We'll dynamically import the CSS on the client side only
 
 interface ReactFlowWrapperProps {
 	children: ReactNode;
@@ -13,6 +12,7 @@ export default function ReactFlowWrapper({ children }: ReactFlowWrapperProps) {
 
 	useEffect(() => {
 		// Import the CSS only on the client side
+		//@ts-ignore
 		import("reactflow/dist/style.css");
 		setMounted(true);
 	}, []);
