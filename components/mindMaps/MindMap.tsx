@@ -1,5 +1,7 @@
 "use client";
 
+import "reactflow/dist/base.css";
+import "reactflow/dist/style.css";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "../ui/button";
 import { EdgeOptions } from "./EdgeOptions";

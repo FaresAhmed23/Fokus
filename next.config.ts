@@ -50,9 +50,31 @@ const nextConfig = {
 		formats: ["image/webp"],
 	},
 
+	transpilePackages: ["reactflow"],
+
 	// Webpack optimizations
 	// @ts-ignore
 	webpack: (config, { isServer }) => {
+		config.module.rules.push({
+			test: /\.css$/,
+			use: [
+				{
+					loader: "postcss-loader",
+					options: {
+						postcssOptions: {
+							plugins: {
+								tailwindcss: {},
+								autoprefixer: {},
+							},
+						},
+					},
+				},
+			],
+			include: [
+				path.join(__dirname, "node_modules/reactflow"),
+				path.join(__dirname, "node_modules/@reactflow"),
+			],
+		});
 		config.resolve.alias = {
 			...config.resolve.alias,
 			"@": path.resolve(__dirname),
@@ -69,7 +91,7 @@ const nextConfig = {
 				child_process: false,
 				stream: require.resolve("stream-browserify"),
 				crypto: require.resolve("crypto-browserify"),
-				buffer: require.resolve("buffer"),
+				buffer: require.resolve("buffer/"),
 				process: require.resolve("process/browser"),
 			};
 		}
@@ -115,6 +137,7 @@ const nextConfig = {
 			"lucide-react",
 			"date-fns",
 			"emoji-mart",
+			"reactflow",
 		],
 		serverActions: {
 			bodySizeLimit: "2mb",
