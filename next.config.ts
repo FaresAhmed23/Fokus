@@ -55,43 +55,25 @@ const nextConfig = {
 	// Webpack optimizations
 	// @ts-ignore
 	webpack: (config, { isServer }) => {
+		config.module.rules = config.module.rules.filter(
+			(rule) => !(rule.test instanceof RegExp && rule.test.test(".css")),
+		);
+
 		config.module.rules.push({
 			test: /\.css$/,
-			use: [
-				"style-loader",
-				"css-loader",
-				{
-					loader: "postcss-loader",
-					options: {
-						postcssOptions: {
-							config: path.resolve(__dirname, "postcss.config.js"),
-						},
-					},
-				},
-			],
+			use: ["style-loader", "css-loader", "postcss-loader"],
 			exclude: /node_modules/,
 		});
 
 		config.module.rules.push({
 			test: /\.css$/,
-			use: [
-				{
-					loader: "postcss-loader",
-					options: {
-						postcssOptions: {
-							plugins: {
-								tailwindcss: {},
-								autoprefixer: {},
-							},
-						},
-					},
-				},
-			],
+			use: ["style-loader", "css-loader", "postcss-loader"],
 			include: [
 				path.join(__dirname, "node_modules/reactflow"),
 				path.join(__dirname, "node_modules/@reactflow"),
 			],
 		});
+
 		config.resolve.alias = {
 			...config.resolve.alias,
 			"@": path.resolve(__dirname),
