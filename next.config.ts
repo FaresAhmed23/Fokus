@@ -72,7 +72,7 @@ const nextConfig = {
 					stream: require.resolve("stream-browserify"),
 					crypto: require.resolve("crypto-browserify"),
 					buffer: require.resolve("buffer"),
-					process: require.resolve("process/browser"),
+					process: require.resolve("process"),
 				},
 			};
 		}
