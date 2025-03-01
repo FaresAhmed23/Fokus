@@ -53,27 +53,24 @@ const nextConfig = {
 	// Webpack optimizations
 	// @ts-ignore
 	webpack: (config, { isServer }) => {
+		config.resolve.alias = {
+			...config.resolve.alias,
+			"@": path.resolve(__dirname),
+			"@/lib": path.resolve(__dirname, "lib"),
+		};
+
 		// Client-side polyfills only
 		if (!isServer) {
-			config.resolve = {
-				...config.resolve,
-				alias: {
-					...config.resolve?.alias,
-					stream: "stream-browserify",
-					crypto: "crypto-browserify",
-				},
-				fallback: {
-					...config.resolve?.fallback,
-					fs: false,
-					net: false,
-					tls: false,
-					child_process: false,
-					debug: require.resolve("debug"),
-					stream: require.resolve("stream-browserify"),
-					crypto: require.resolve("crypto-browserify"),
-					buffer: require.resolve("buffer"),
-					process: require.resolve("process/browser"),
-				},
+			config.resolve.fallback = {
+				...config.resolve?.fallback,
+				fs: false,
+				net: false,
+				tls: false,
+				child_process: false,
+				stream: require.resolve("stream-browserify"),
+				crypto: require.resolve("crypto-browserify"),
+				buffer: require.resolve("buffer"),
+				process: require.resolve("process/browser"),
 			};
 		}
 
