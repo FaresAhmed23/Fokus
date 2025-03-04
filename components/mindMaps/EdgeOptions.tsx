@@ -37,9 +37,14 @@ import { EdgeColor } from "@/types/enums";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { ScrollArea } from "../ui/scroll-area";
 import { useTranslations } from "next-intl";
-import { z } from "zod";
 
-interface Props {
+type EdgeType =
+	| "customBezier"
+	| "customStraight"
+	| "customStepSharp"
+	| "customStepRounded";
+
+interface EdgeOptionsProps {
 	clickedEdge: Edge | null;
 	isOpen: boolean;
 	onSave: (data: EdgeOptionsSchema) => void;
@@ -66,7 +71,7 @@ export const EdgeOptions = ({
 	isOpen,
 	onDeleteEdge,
 	onSave,
-}: Props) => {
+}: EdgeOptionsProps) => {
 	const t = useTranslations("MIND_MAP.EDGE_OPTIONS");
 
 	const edgeOptionsSchema = createEdgeOptionsSchema({
@@ -85,23 +90,20 @@ export const EdgeOptions = ({
 	});
 
 	useEffect(() => {
-		if (isOpen) {
+		if (isOpen && clickedEdge) {
+			const edgeType = (clickedEdge.type as EdgeType) || "customBezier";
+
 			form.reset({
-				edgeId: clickedEdge?.id,
-				label: clickedEdge?.data?.label?.toString() ?? "",
-				type:
-					(clickedEdge?.type as
-						| "customBezier"
-						| "customStraight"
-						| "customStepSharp"
-						| "customStepRounded") ?? "customBeizer",
-				animated: clickedEdge?.animated ?? false,
-				color: clickedEdge?.data?.color ?? EdgeColor.DEFAULT,
+				edgeId: clickedEdge.id,
+				label: clickedEdge.data?.label?.toString() ?? "",
+				type: edgeType,
+				animated: clickedEdge.animated ?? false,
+				color: clickedEdge.data?.color ?? EdgeColor.DEFAULT,
 			});
 		}
 	}, [clickedEdge, form, isOpen]);
 
-	const workspaceColor = useCallback((providedColor: EdgeColor) => {
+	const workspaceColor = useCallback((providedColor: EdgeColor): string => {
 		switch (providedColor) {
 			case EdgeColor.PURPLE:
 				return "bg-purple-600 border-purple-600 hover:bg-purple-500 hover:border-purple-500";
@@ -134,6 +136,13 @@ export const EdgeOptions = ({
 
 	const onSubmit = (data: EdgeOptionsSchema) => {
 		onSave(data);
+	};
+
+	const handleDeleteEdge = () => {
+		const edgeId = form.getValues("edgeId");
+		if (edgeId) {
+			onDeleteEdge(edgeId);
+		}
 	};
 
 	return (
@@ -181,10 +190,13 @@ export const EdgeOptions = ({
 											<Select
 												onValueChange={field.onChange}
 												defaultValue={field.value}
+												value={field.value}
 											>
 												<FormControl>
 													<SelectTrigger>
-														<SelectValue placeholder="Select a Connection Type"></SelectValue>
+														<SelectValue
+															placeholder={t("FORM.TYPE.PLACEHOLDER")}
+														/>
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent>
@@ -219,6 +231,7 @@ export const EdgeOptions = ({
 												<RadioGroup
 													onValueChange={field.onChange}
 													defaultValue={field.value}
+													value={field.value}
 													className="grid grid-cols-10 grid-rows-2"
 												>
 													{colors.map((color) => (
@@ -229,12 +242,10 @@ export const EdgeOptions = ({
 															<FormControl>
 																<RadioGroupItem
 																	value={color}
-																	//@ts-ignore
-																	useCheckIcon
 																	className={`transition-colors duration-200 ${workspaceColor(
 																		color,
 																	)}`}
-																></RadioGroupItem>
+																/>
 															</FormControl>
 														</FormItem>
 													))}
@@ -271,11 +282,9 @@ export const EdgeOptions = ({
 							{t("FORM.BTN_SAVE")}
 						</Button>
 						<Button
-							onClick={() => {
-								onDeleteEdge(form.getValues("edgeId"));
-							}}
-							variant={"secondary"}
-							className=" w-full"
+							onClick={handleDeleteEdge}
+							variant="secondary"
+							className="w-full"
 							type="button"
 						>
 							{t("FORM.BTN_DELETE_EDGE")}

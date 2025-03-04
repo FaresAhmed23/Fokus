@@ -11,12 +11,15 @@ import ReactFlow, {
 	Edge,
 	EdgeTypes,
 	Node,
+	NodeTypes,
 	OnConnect,
 	OnEdgesChange,
 	OnNodesChange,
 	Panel,
+	ReactFlowInstance,
 	ReactFlowJsonObject,
 } from "reactflow";
+import "reactflow/dist/style.css";
 import { TextNode } from "./nodes/TextNode";
 import { CustomBezier } from "./labels/CustomBezier";
 import { CustomStraight } from "./labels/CustomStraight";
@@ -24,7 +27,7 @@ import { CustomStepSharp } from "./labels/CustomStepSharp";
 import { CustomStepRounded } from "./labels/CustomStepRounded";
 import { Sheet } from "../ui/sheet";
 import { EdgeOptionsSchema } from "@/schema/edgeOptionsSchema";
-import { MindMap as MindMapType, Tag } from "@prisma/client";
+import { Tag } from "@prisma/client";
 import { useDebouncedCallback } from "use-debounce";
 import { LoadingScreen } from "../common/LoadingScreen";
 import {
@@ -41,8 +44,8 @@ import { MindMapTagsSelector } from "./MindMapTagSelector";
 import { EditInfo } from "./editInfo/EditInfo";
 import { ExtendedMindMap } from "@/types/extended";
 import { useTranslations } from "next-intl";
-import ReactFlowWrapper from "./ReactFlowWrapper";
 
+// Define edge types with proper typing
 const edgeTypes: EdgeTypes = {
 	customBezier: CustomBezier,
 	customStraight: CustomStraight,
@@ -50,7 +53,7 @@ const edgeTypes: EdgeTypes = {
 	customStepRounded: CustomStepRounded,
 };
 
-interface Props {
+interface MindMapProps {
 	initialInfo: ExtendedMindMap;
 	workspaceId: string;
 	canEdit: boolean;
@@ -62,28 +65,31 @@ export const MindMap = ({
 	workspaceId,
 	canEdit,
 	initialActiveTags,
-}: Props) => {
+}: MindMapProps) => {
 	const [clickedEdge, setClickedEdge] = useState<Edge | null>(null);
-	const [openSheet, setOpenSheet] = useState(false);
+	const [openSheet, setOpenSheet] = useState<boolean>(false);
 	const [nodes, setNodes] = useState<Node[]>([]);
 	const [edges, setEdges] = useState<Edge[]>([]);
-	const nodeTypes = useMemo(() => ({ textNode: TextNode }), []);
-	const [isMounted, setIsMounted] = useState(false);
-	const [isEditable, setIsEditable] = useState(canEdit);
+	const nodeTypes = useMemo<NodeTypes>(() => ({ textNode: TextNode }), []);
+	const [isMounted, setIsMounted] = useState<boolean>(false);
+	const [isEditable, setIsEditable] = useState<boolean>(canEdit);
 	const t = useTranslations("MIND_MAP");
 
 	const { setRfInstance, onSave, onSetIds } = useAutoSaveMindMap();
 	const { onSetStatus, status } = useAutosaveIndicator();
 
+	// Use debounce for better performance when saving mind map changes
 	const debouncedMindMapInfo = useDebouncedCallback(() => {
 		onSetStatus("pending");
 		onSave();
 	}, 3000);
 
+	// Initialize component
 	useEffect(() => {
 		setIsMounted(true);
 	}, []);
 
+	// Load initial content
 	useEffect(() => {
 		const { content } = initialInfo;
 		if (content) {
@@ -95,12 +101,18 @@ export const MindMap = ({
 		onSetIds(initialInfo.id, workspaceId);
 	}, [initialInfo, initialInfo.id, workspaceId, onSetIds]);
 
+	// Update editable state when canEdit prop changes
+	useEffect(() => {
+		setIsEditable(canEdit);
+	}, [canEdit]);
+
+	// Add a new node
 	const onAddNode = useCallback(() => {
-		const newNode = {
-			id: Math.random().toString(),
+		const newNode: Node = {
+			id: `node-${Math.random().toString(36).substring(2, 9)}`,
 			type: "textNode",
 			position: { x: 0, y: 0 },
-			data: { text: "test", color: 12 },
+			data: { text: "New Node", color: 12 },
 		};
 
 		setNodes((nds) => nds.concat(newNode));
@@ -108,22 +120,33 @@ export const MindMap = ({
 		debouncedMindMapInfo();
 	}, [debouncedMindMapInfo, onSetStatus]);
 
-	const onNodesChange: OnNodesChange = useCallback((changes: any) => {
-		setNodes((nds) => {
-			return applyNodeChanges(changes, nds);
-		});
-	}, []);
+	// Handle node changes
+	const onNodesChange: OnNodesChange = useCallback(
+		(changes) => {
+			setNodes((nds) => applyNodeChanges(changes, nds));
+			// Don't trigger save on selection changes
+			if (changes.some((change) => change.type !== "select")) {
+				onSetStatus("unsaved");
+				debouncedMindMapInfo();
+			}
+		},
+		[debouncedMindMapInfo, onSetStatus],
+	);
 
-	useEffect(() => {
-		setIsEditable(canEdit);
-	}, [canEdit]);
+	// Handle edge changes
+	const onEdgesChange: OnEdgesChange = useCallback(
+		(changes) => {
+			setEdges((eds) => applyEdgeChanges(changes, eds));
+			// Don't trigger save on selection changes
+			if (changes.some((change) => change.type !== "select")) {
+				onSetStatus("unsaved");
+				debouncedMindMapInfo();
+			}
+		},
+		[debouncedMindMapInfo, onSetStatus],
+	);
 
-	const onEdgesChange: OnEdgesChange = useCallback((changes: any) => {
-		setEdges((eds) => {
-			return applyEdgeChanges(changes, eds);
-		});
-	}, []);
-
+	// Handle edge click
 	const onEdgeClick = useCallback(
 		(event: React.MouseEvent, edge: Edge) => {
 			if (!isEditable) return;
@@ -133,32 +156,31 @@ export const MindMap = ({
 		[isEditable],
 	);
 
+	// Handle new connections
 	const onConnect: OnConnect = useCallback(
 		(params) => {
-			setEdges((eds) => addEdge(params, eds));
+			setEdges((eds) => addEdge({ ...params, type: "customBezier" }, eds));
 			onSetStatus("unsaved");
 			debouncedMindMapInfo();
 		},
 		[debouncedMindMapInfo, onSetStatus],
 	);
 
+	// Save edge changes
 	const onSaveChange = useCallback(
 		(data: EdgeOptionsSchema) => {
-			//@ts-ignore
 			const { animated, edgeId, label, color, type } = data;
 			setEdges((prevEdges) => {
-				const edges = prevEdges.map((edge) =>
+				return prevEdges.map((edge) =>
 					edge.id === edgeId
 						? {
 								...edge,
-								data: label ? { label, color } : undefined,
+								data: { ...edge.data, label, color },
 								type,
 								animated,
 						  }
 						: edge,
 				);
-
-				return edges;
 			});
 			setOpenSheet(false);
 			onSetStatus("unsaved");
@@ -167,12 +189,10 @@ export const MindMap = ({
 		[debouncedMindMapInfo, onSetStatus],
 	);
 
+	// Delete an edge
 	const onDeleteEdge = useCallback(
 		(edgeId: string) => {
-			setEdges((prevEdges) => {
-				const edges = prevEdges.filter((edge) => edge.id !== edgeId);
-				return edges;
-			});
+			setEdges((prevEdges) => prevEdges.filter((edge) => edge.id !== edgeId));
 			setOpenSheet(false);
 			onSetStatus("unsaved");
 			debouncedMindMapInfo();
@@ -180,127 +200,141 @@ export const MindMap = ({
 		[debouncedMindMapInfo, onSetStatus],
 	);
 
+	// Handle node drag
 	const onNodeDrag = useCallback(() => {
 		onSetStatus("unsaved");
 		debouncedMindMapInfo();
 	}, [debouncedMindMapInfo, onSetStatus]);
 
+	// Handle node deletion
 	const onNodesDelete = useCallback(() => {
 		onSetStatus("unsaved");
 		debouncedMindMapInfo();
 	}, [debouncedMindMapInfo, onSetStatus]);
 
+	// Handle manual save
+	const handleManualSave = useCallback(() => {
+		onSetStatus("pending");
+		onSave();
+	}, [onSave, onSetStatus]);
+
+	// Set React Flow instance
+	const handleInit = useCallback(
+		(instance: ReactFlowInstance) => {
+			setRfInstance(instance);
+		},
+		[setRfInstance],
+	);
+
 	if (!isMounted) return <LoadingScreen />;
 
 	return (
-		<ReactFlowWrapper>
-			<div className="w-full h-full flex flex-col">
-				{clickedEdge && (
-					<Sheet open={openSheet} onOpenChange={setOpenSheet}>
-						<EdgeOptions
-							clickedEdge={clickedEdge}
-							isOpen={openSheet}
-							onSave={onSaveChange}
-							onDeleteEdge={onDeleteEdge}
-						/>
-					</Sheet>
-				)}
+		<div className="w-full h-full flex flex-col">
+			{clickedEdge && (
+				<Sheet open={openSheet} onOpenChange={setOpenSheet}>
+					<EdgeOptions
+						clickedEdge={clickedEdge}
+						isOpen={openSheet}
+						onSave={onSaveChange}
+						onDeleteEdge={onDeleteEdge}
+					/>
+				</Sheet>
+			)}
 
-				<div className="h-full">
-					<ReactFlow
-						fitView
-						onInit={setRfInstance}
-						onNodeDrag={onNodeDrag}
-						nodes={nodes}
-						nodeTypes={nodeTypes}
-						edges={edges}
-						edgeTypes={edgeTypes}
-						onNodesChange={onNodesChange}
-						onEdgesChange={onEdgesChange}
-						onConnect={onConnect}
-						onEdgeClick={onEdgeClick}
-						onNodesDelete={onNodesDelete}
-						connectOnClick={isEditable}
-						edgesUpdatable={isEditable}
-						edgesFocusable={isEditable}
-						nodesDraggable={isEditable}
-						nodesConnectable={isEditable}
-						nodesFocusable={isEditable}
-						elementsSelectable={isEditable}
-						proOptions={{
-							hideAttribution: true,
-						}}
-					>
-						{isEditable && (
-							<Panel
-								position="top-left"
-								className="bg-background z-50 shadow-sm border rounded-sm py-0.5 px-3"
-							>
-								<div className="flex gap-2 w-full items-center">
-									<HoverCard openDelay={250} closeDelay={250}>
-										<HoverCardTrigger asChild>
-											<Button
-												variant={"ghost"}
-												size={"icon"}
-												onClick={onAddNode}
-											>
-												<PlusSquare size={22} />
-											</Button>
-										</HoverCardTrigger>
-										<HoverCardContent align="start">
-											{t("HOVER_TIP.ADD_TITLE")}
-										</HoverCardContent>
-									</HoverCard>
+			<div className="h-full">
+				<ReactFlow
+					fitView
+					onInit={handleInit}
+					onNodeDrag={onNodeDrag}
+					nodes={nodes}
+					nodeTypes={nodeTypes}
+					edges={edges}
+					edgeTypes={edgeTypes}
+					onNodesChange={onNodesChange}
+					onEdgesChange={onEdgesChange}
+					onConnect={onConnect}
+					onEdgeClick={onEdgeClick}
+					onNodesDelete={onNodesDelete}
+					connectOnClick={isEditable}
+					edgesUpdatable={isEditable}
+					edgesFocusable={isEditable}
+					nodesDraggable={isEditable}
+					nodesConnectable={isEditable}
+					nodesFocusable={isEditable}
+					elementsSelectable={isEditable}
+					deleteKeyCode={["Backspace", "Delete"]}
+					proOptions={{
+						hideAttribution: true,
+					}}
+				>
+					{isEditable && (
+						<Panel
+							position="top-left"
+							className="bg-background z-50 shadow-sm border rounded-sm py-0.5 px-3"
+						>
+							<div className="flex gap-2 w-full items-center">
+								<HoverCard openDelay={250} closeDelay={250}>
+									<HoverCardTrigger asChild>
+										<Button
+											variant="ghost"
+											size="icon"
+											onClick={onAddNode}
+											aria-label={t("HOVER_TIP.ADD_TITLE")}
+										>
+											<PlusSquare size={22} />
+										</Button>
+									</HoverCardTrigger>
+									<HoverCardContent align="start">
+										{t("HOVER_TIP.ADD_TITLE")}
+									</HoverCardContent>
+								</HoverCard>
 
-									<EditInfo
-										workspaceId={workspaceId}
-										title={initialInfo.title}
-										mapId={initialInfo.id}
-										emoji={initialInfo.emoji}
-									/>
+								<EditInfo
+									workspaceId={workspaceId}
+									title={initialInfo.title}
+									mapId={initialInfo.id}
+									emoji={initialInfo.emoji}
+								/>
 
-									<HoverCard openDelay={250} closeDelay={250}>
-										<HoverCardTrigger asChild>
-											<Button
-												variant={"ghost"}
-												size={"icon"}
-												onClick={() => {
-													onSetStatus("pending");
-													onSave();
-												}}
-												disabled={status === "pending" || status === "saved"}
-											>
-												<Save size={22} />
-											</Button>
-										</HoverCardTrigger>
-										<HoverCardContent align="start" sideOffset={8}>
-											{t("HOVER_TIP.SAVE")}
-										</HoverCardContent>
-									</HoverCard>
+								<HoverCard openDelay={250} closeDelay={250}>
+									<HoverCardTrigger asChild>
+										<Button
+											variant="ghost"
+											size="icon"
+											onClick={handleManualSave}
+											disabled={status === "pending" || status === "saved"}
+											aria-label={t("HOVER_TIP.SAVE")}
+										>
+											<Save size={22} />
+										</Button>
+									</HoverCardTrigger>
+									<HoverCardContent align="start" sideOffset={8}>
+										{t("HOVER_TIP.SAVE")}
+									</HoverCardContent>
+								</HoverCard>
 
-									<DeleteAllNodes
-										workspaceId={workspaceId}
-										mindMapId={initialInfo.id}
-									/>
+								<DeleteAllNodes
+									workspaceId={workspaceId}
+									mindMapId={initialInfo.id}
+								/>
 
-									<div className="h-8">
-										<Separator orientation="vertical" />
-									</div>
-
-									<MindMapTagsSelector
-										initialActiveTags={initialActiveTags}
-										mindMapId={initialInfo.id}
-										isMounted={isMounted}
-										workspaceId={workspaceId}
-									/>
+								<div className="h-8">
+									<Separator orientation="vertical" />
 								</div>
-							</Panel>
-						)}
 
-						<Background />
-					</ReactFlow>
-				</div>
+								<MindMapTagsSelector
+									initialActiveTags={initialActiveTags}
+									mindMapId={initialInfo.id}
+									isMounted={isMounted}
+									workspaceId={workspaceId}
+								/>
+							</div>
+						</Panel>
+					)}
+
+					<Background />
+				</ReactFlow>
 			</div>
-		</ReactFlowWrapper>
+		</div>
 	);
 };
