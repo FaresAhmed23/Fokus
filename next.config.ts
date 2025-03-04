@@ -24,7 +24,13 @@ const nextConfig = {
 	},
 
 	// Webpack configuration
-	webpack: (config) => {
+	webpack: (config, { dev, isServer }) => {
+		// Enhanced path resolution - fixing the @/lib/utils issue
+		config.resolve.alias = {
+			...config.resolve.alias,
+			"@/lib": path.resolve(__dirname, "./lib"),
+		};
+
 		// Ensure proper CSS handling for ReactFlow
 		config.resolve = {
 			...config.resolve,
@@ -74,11 +80,6 @@ const nextConfig = {
 			"emoji-mart",
 		],
 	},
-
-	// Set reasonable memory limit for builds
-	// env: {
-	// 	NODE_OPTIONS: "--max-old-space-size=4096",
-	// },
 };
 
 module.exports = withNextIntl(nextConfig);
