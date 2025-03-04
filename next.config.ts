@@ -1,3 +1,5 @@
+import path from "path";
+
 const withNextIntl = require("next-intl/plugin")("./i18n.ts");
 
 /** @type {import('next').NextConfig} */
@@ -42,6 +44,10 @@ const nextConfig = {
 			if (!config.resolve) {
 				config.resolve = {};
 			}
+			config.resolve.alias = {
+				...config.resolve.alias,
+				"@/lib/utils": path.resolve(__dirname, "./lib/utils.ts"),
+			};
 			if (!config.resolve.fallback) {
 				config.resolve.fallback = {};
 			}
@@ -52,7 +58,7 @@ const nextConfig = {
 				tls: false,
 				child_process: false,
 				debug: require.resolve("debug"),
-				util: require.resolve("util/"),
+				util: require.resolve("util"), // Removed trailing slash
 				stream: require.resolve("stream-browserify"),
 				path: require.resolve("path-browserify"),
 				crypto: require.resolve("crypto-browserify"),
