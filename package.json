@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
-		"build": "next build",
+		"build": "prisma generate && next build",
 		"start": "next start",
 		"lint": "next lint"
 	},
@@ -39,6 +39,7 @@
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"cmdk": "^1.0.4",
+		"crypto-browserify": "^3.12.1",
 		"cytoscape": "^3.31.1",
 		"date-fns": "^4.1.0",
 		"dayjs": "^1.11.13",
@@ -52,6 +53,7 @@
 		"next-auth": "^4.24.11",
 		"next-intl": "^3.26.3",
 		"next-themes": "^0.4.4",
+		"path-browserify": "^1.0.1",
 		"react": "^19.0.0",
 		"react-contenteditable": "^3.3.7",
 		"react-day-picker": "^9.5.1",
@@ -59,11 +61,13 @@
 		"react-hook-form": "^7.54.2",
 		"react-textarea-autosize": "^8.5.7",
 		"reactflow": "^11.11.4",
+		"stream-browserify": "^3.0.0",
 		"tailwind-merge": "^3.0.1",
 		"tailwindcss-animate": "^1.0.7",
 		"unique-username-generator": "^1.4.0",
 		"uploadthing": "^7.4.4",
 		"use-debounce": "^10.0.4",
+		"util": "^0.12.5",
 		"uuid": "^11.0.5",
 		"zod": "^3.24.1",
 		"zustand": "^5.0.3"
@@ -79,11 +83,7 @@
 		"@types/react-dom": "^19",
 		"postcss": "^8",
 		"prisma": "^6.3.1",
-		"crypto-browserify": "^3.12.1",
-		"path-browserify": "^1.0.1",
-		"stream-browserify": "^3.0.0",
 		"tailwindcss": "^3.4.1",
-		"typescript": "^5",
-		"util": "^0.12.5"
+		"typescript": "^5"
 	}
 }

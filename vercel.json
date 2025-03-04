@@ -11,7 +11,8 @@
 	],
 	"build": {
 		"env": {
-			"PRISMA_GENERATE": "true"
+			"PRISMA_GENERATE": "true",
+			"NODE_ENV": "production"
 		}
 	}
 }
